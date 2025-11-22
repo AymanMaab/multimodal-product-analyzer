@@ -1,0 +1,37 @@
+# Fusion Model Configuration
+
+model:
+  vision_embed_dim: 768
+  nlp_embed_dim: 768
+  fusion_type: "concat"  # or "early", "late"
+  fusion_hidden_dims: [512, 256, 128]
+  dropout: 0.3
+  use_cross_attention: true
+  freeze_encoders: true
+
+training:
+  epochs: 20
+  batch_size: 32
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-4
+  gradient_clip: 1.0
+
+# Multi-task learning weights
+loss_weights:
+  category: 1.0
+  sentiment: 1.0
+  recommendation: 2.0
+
+optimizer:
+  type: "adamw"
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+
+scheduler:
+  type: "cosine"
+  eta_min: 1.0e-6
+
+# Model loading
+pretrained:
+  vision_checkpoint: "models/vision/best_acc.pth"
+  nlp_checkpoint: "models/nlp/best_acc.pth"

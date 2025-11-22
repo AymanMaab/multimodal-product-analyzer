@@ -1,0 +1,40 @@
+# Vision Model Configuration
+
+model:
+  name: "google/vit-base-patch16-224"
+  type: "vit"  # or "cnn"
+  num_classes: 10
+  hidden_dim: 512
+  dropout: 0.3
+  freeze_backbone: false
+
+training:
+  epochs: 30
+  batch_size: 32
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-4
+  warmup_epochs: 5
+  gradient_clip: 1.0
+
+data:
+  img_size: 224
+  normalize_mean: [0.485, 0.456, 0.406]
+  normalize_std: [0.229, 0.224, 0.225]
+
+augmentation:
+  use_augmentation: true
+  horizontal_flip_prob: 0.5
+  rotation_limit: 15
+  brightness_limit: 0.2
+  contrast_limit: 0.2
+  gaussian_blur_prob: 0.3
+  coarse_dropout_prob: 0.3
+
+optimizer:
+  type: "adamw"
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
+
+scheduler:
+  type: "cosine"
+  eta_min: 1.0e-6

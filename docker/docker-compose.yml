@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # FastAPI Backend
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: api
+    container_name: multimodal-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../models:/app/models
+      - ../data:/app/data
+      - ../logs:/app/logs
+    environment:
+      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-}
+    restart: unless-stopped
+    networks:
+      - multimodal-net
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # Streamlit Dashboard
+  dashboard:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: dashboard
+    container_name: multimodal-dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      - ../models:/app/models
+      - ../data:/app/data
+    environment:
+      - API_URL=http://api:8000
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - multimodal-net
+
+  # Redis (for caching predictions - optional)
+  redis:
+    image: redis:7-alpine
+    container_name: multimodal-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - multimodal-net
+
+networks:
+  multimodal-net:
+    driver: bridge
+
+volumes:
+  redis-data:
